@@ -1,0 +1,45 @@
+/* General styles for buttons and options */
+.option {
+    font-size: 16px;
+    color: #333; /* Neutral color for text */
+    background-color: #fff; /* White background */
+    padding: 12px;
+    border: 2px solid #ccc; /* Neutral border color */
+    margin: 5px 0;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 5px; /* Optional rounded corners for aesthetic */
+  }
+  
+  .option:hover {
+    background-color: #f0f0f0; /* Light gray on hover */
+  }
+  
+  .option:active {
+    background-color: #e0e0e0; /* Darker gray when clicked */
+  }
+  
+  .option.selected {
+    background-color: #d1c4e9; /* Light purple when selected */
+    color: #333;
+  }
+  
+  /* Consistent font for the questions */
+  .question {
+    font-family: 'Times New Roman', Times, serif; /* Standard font for questions */
+    font-weight: bold;
+    font-size: 18px;
+    color: #333; /* Neutral color */
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  /* Result Display */
+  .result {
+    font-size: 22px;
+    color: #333;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MBTI Quiz - Introduction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-light: linear-gradient(to right, #c4a98a, #e2c9a0);
+      --bg-dark: #4f4b44;
+      --card-light: #f2ede7;
+      --card-dark: #6e5c4e;
+      --text-light: #3e2e20;
+      --text-dark: #f3e6d2;
+      --btn-light: #d4b07a;
+      --btn-dark: #8b6a4e;
+      --btn-hover-light: #b9966b;
+      --btn-hover-dark: #7a553b;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      transition: background-color 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px 32px;
+    }
+
+    .toggle-btn {
+      border: 2px solid;
+      padding: 8px 14px;
+      font-size: 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      background-color: transparent;
+    }
+
+    .container {
+      background: var(--card-light);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      width: 60%;
+      margin: 60px auto;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeSlide 1s ease-out forwards;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container.dark {
+      background: var(--card-dark);
+    }
+
+    h1 {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-family: 'Georgia', serif;
+      font-weight: normal;
+      margin-bottom: 18px;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    .dark h2 {
+      color: var(--text-dark);
+    }
+
+    .continue-btn {
+      margin-top: 30px;
+      padding: 10px 24px;
+      background-color: var(--btn-light);
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: background 0.3s ease;
+      font-family: 'Georgia', serif;
+    }
+
+    .continue-btn:hover {
+      background-color: var(--btn-hover-light);
+    }
+
+    .dark .continue-btn {
+      background-color: var(--btn-dark);
+    }
+
+    .dark .continue-btn:hover {
+      background-color: var(--btn-hover-dark);
+    }
+
+    body.light {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    @keyframes fadeSlide {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .italic {
+      font-style: italic;
+    }
+  </style>
+</head>
+<body class="light">
+
+  <div class="top-bar">
+    <button class="toggle-btn" onclick="toggleMode()">Switch Theme</button>
+  </div>
+
+  <div class="container" id="mainBox">
+    <h1>Welcome, <span id="userName"></span></h1>
+
+    <h2>
+      Ever wondered why some people enjoy quiet time alone while others thrive in social settings? The Myers-Briggs Type Indicator (MBTI) is a well-known personality framework that helps individuals understand themselves better by identifying their preferences in how they think, behave, and interact with the world. Developed by Isabel Briggs Myers and Katharine Cook Briggs, MBTI classifies people into 16 different personality types based on four key dichotomies that influence how we process information and make decisions. <br><br>
+      <span class="italic">I / E</span>: Introversion vs. Extraversion – How you direct your energy, either towards the world around you (E) or your inner thoughts (I). <br>
+      <span class="italic">N / S</span>: Intuition vs. Sensing – How you perceive and process information; whether you prefer big-picture ideas (N) or focus on facts and details (S). <br>
+      <span class="italic">F / T</span>: Feeling vs. Thinking – How you make decisions, either based on your personal values (F) or logical analysis (T). <br>
+      <span class="italic">J / P</span>: Judging vs. Perceiving – How you approach the outside world, with a preference for structure (J) or flexibility (P).
+    </h2>
+    
+
+    <h2>
+      Your unique combination across these traits reveals your personality type and helps you better understand yourself and your interactions.
+    </h2>
+
+    <button onclick="startQuiz()" class="continue-btn">Take the Quiz</button>
+  </div>
+
+  <script>
+    // Theme load
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.body.classList.add(savedTheme);
+    const box = document.getElementById("mainBox");
+    if (savedTheme === "dark") {
+      box.classList.add("dark");
+    }
+
+    // User name load
+    const userName = localStorage.getItem("name");
+    document.getElementById("userName").textContent = userName;
+
+    // Toggle theme + save
+    function toggleMode() {
+      const body = document.body;
+      const box = document.getElementById("mainBox");
+      if (body.classList.contains("light")) {
+        body.classList.replace("light", "dark");
+        box.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        body.classList.replace("dark", "light");
+        box.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+    }
+
+    // Start quiz
+    function startQuiz() {
+      window.location.href = "quiz.html";
+    }
+  </script>
+
+</body>
+</html>

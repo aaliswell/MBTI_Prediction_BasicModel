@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MBTI Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-light: linear-gradient(to right, #c4a98a, #e2c9a0);
+      --bg-dark: #4f4b44;
+      --card-light: #f2ede7;
+      --card-dark: #6e5c4e;
+      --text-light: #3e2e20;
+      --text-dark: #f3e6d2;
+      --btn-light: #d4b07a;
+      --btn-dark: #8b6a4e;
+      --btn-hover-light: #b9966b;
+      --btn-hover-dark: #7a553b;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      transition: background-color 0.3s, color 0.3s;
+      overflow-x: hidden;
+      cursor: url('https://cur.cursors-4u.net/cursors/cur-2/cur115.cur'), auto;
+    }
+
+    .container {
+      background: var(--card-light);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      width: 60%;
+      margin: 60px auto;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeSlide 1s ease-out forwards;
+    }
+
+    .container.dark {
+      background: var(--card-dark);
+    }
+
+    h1 { font-size: 36px; font-weight: bold; margin-bottom: 20px; }
+    h2 { font-size: 22px; font-family: 'Georgia', serif; font-style: italic; margin-bottom: 30px; color: var(--text-light); }
+    .dark h2 { color: var(--text-dark); }
+
+    .answer-button {
+      padding: 12px;
+      font-size: 18px;
+      border-radius: 30px;
+      border: none;
+      background-color: var(--btn-light);
+      color: white;
+      font-family: 'Georgia', serif;
+      transition: background-color 0.3s;
+      width: 100%;
+      max-width: 400px;
+      margin: 10px auto;
+      display: block;
+    }
+
+    .dark .answer-button { background-color: var(--btn-dark); color: var(--text-dark); }
+    .answer-button:hover { background-color: var(--btn-hover-light); }
+    .dark .answer-button:hover { background-color: var(--btn-hover-dark); }
+
+    body.light { background: var(--bg-light); color: var(--text-light); }
+    body.dark { background-color: var(--bg-dark); color: var(--text-dark); }
+
+    @keyframes fadeSlide {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    #resultBox {
+      display: none;
+      margin-top: 40px;
+      padding: 30px;
+      border-radius: 16px;
+      background-color: #f5efe5;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      animation: fadeSlide 1s ease-out forwards;
+    }
+    .dark #resultBox { background-color: #5e4a3a; }
+
+    #mbtiType { font-size: 32px; font-weight: bold; margin-bottom: 12px; }
+    #mbtiDesc { font-size: 18px; font-style: italic; margin-bottom: 20px; }
+    .question { margin-bottom: 20px; font-size: 18px; }
+      .continue-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  margin: 12px auto;
+  display: block;
+  width: auto;
+  max-width: 220px;
+  background-color: var(--btn-light);
+  color: white;
+  font-family: 'Georgia', serif;
+  transition: background-color 0.3s;
+}
+
+    .dark .continue-btn {
+      background-color: var(--btn-dark);
+      color: var(--text-dark);
+    }
+
+    .continue-btn:hover {
+      background-color: var(--btn-hover-light);
+    }
+
+    .dark .continue-btn:hover {
+      background-color: var(--btn-hover-dark);
+    }
+
+</style>
+</head>
+<body class="light">
+<div class="container" id="mainBox">
+  <h1><strong>MBTI Quiz</strong></h1>
+  <h2><em>Choose what best fits your approach:</em></h2>
+  <div id="questionContainer"></div>
+  <div id="answerOptions"></div>
+  <div id="resultBox">
+    <div id="mbtiType"></div>
+    <div id="mbtiDesc"></div>
+    <button class="continue-btn" onclick="retakeQuiz()">Retake Quiz</button>
+    <button class="continue-btn" onclick="window.open('https://www.16personalities.com/', '_blank')">Know More</button>
+    <button class="continue-btn" onclick="goToResultPage()">About Your MBTI</button>
+  </div>
+</div>
+<script>
+const typeCounts = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+
+const allQuestions = [
+  { question: "You enter a room full of people. What do you do first?", options: [
+    { text: "Look for someone to talk to", trait: "E" },
+    { text: "Find a quiet corner", trait: "I" },
+    { text: "Join a group discussion", trait: "E" },
+    { text: "Observe silently from afar", trait: "I" }
+  ]},
+  { question: "It’s a rainy day. What’s your ideal activity?", options: [
+    { text: "Curl up with a book", trait: "I" },
+    { text: "Go out for a walk in the rain", trait: "E" },
+    { text: "Invite someone over", trait: "E" },
+    { text: "Write or draw quietly", trait: "I" }
+  ]},
+  { question: "You’re at a party. What do you do?", options: [
+    { text: "Talk to everyone", trait: "E" },
+    { text: "Stick with a few close friends", trait: "I" },
+    { text: "Make small talk with anyone", trait: "E" },
+    { text: "Observe and listen", trait: "I" }
+  ]},
+  { question: "Which activity would you prefer?", options: [
+    { text: "Spontaneously make plans with someone", trait: "P" },
+    { text: "Plan your day ahead of time", trait: "J" },
+    { text: "Go with the flow", trait: "P" },
+    { text: "Wait and see how the day unfolds", trait: "P" }
+  ]},
+  { question: "How do you prefer to work?", options: [
+    { text: "On one task at a time", trait: "J" },
+    { text: "Multitask with multiple activities", trait: "P" },
+    { text: "Create detailed plans before working", trait: "J" },
+    { text: "Get it done as you go along", trait: "P" }
+  ]},
+  { question: "When making a decision, what is most important to you?", options: [
+    { text: "Logic and objectivity", trait: "T" },
+    { text: "Feelings and the impact on others", trait: "F" },
+    { text: "Practicality", trait: "T" },
+    { text: "Personal values and morals", trait: "F" }
+  ]},
+  { question: "How do you prefer to make decisions?", options: [
+    { text: "Based on facts and logic", trait: "T" },
+    { text: "Considering the feelings of others", trait: "F" },
+    { text: "Analyzing all options", trait: "T" },
+    { text: "Using gut feelings and instincts", trait: "F" }
+  ]},
+  { question: "When faced with a problem, how do you approach it?", options: [
+    { text: "Analyze it logically", trait: "S" },
+    { text: "Look for creative solutions", trait: "N" },
+    { text: "Consult with others for advice", trait: "F" },
+    { text: "Use past experiences to guide decisions", trait: "S" }
+  ]},
+  { question: "You prefer to focus on...", options: [
+    { text: "The big picture", trait: "N" },
+    { text: "The details and specifics", trait: "S" },
+    { text: "Future possibilities", trait: "N" },
+    { text: "Present experiences", trait: "S" }
+  ]},
+  { question: "How do you recharge after a long day?", options: [
+    { text: "Spending time alone", trait: "I" },
+    { text: "Being around people", trait: "E" },
+    { text: "Engaging in a hobby or activity", trait: "I" },
+    { text: "Relaxing in solitude", trait: "I" }
+  ]},
+  { question: "You prefer to plan ahead for...", options: [
+    { text: "The week ahead", trait: "J" },
+    { text: "The day ahead", trait: "J" },
+    { text: "The next few hours", trait: "P" },
+    { text: "The next month or year", trait: "J" }
+  ]},
+  { question: "In social situations, you are most likely to...", options: [
+    { text: "Take charge and organize activities", trait: "E" },
+    { text: "Let others take the lead and observe", trait: "I" },
+    { text: "Be the life of the party", trait: "E" },
+    { text: "Stay in the background and contribute quietly", trait: "I" }
+  ]},
+  { question: "When deciding on a vacation, you prefer...", options: [
+    { text: "A planned itinerary", trait: "J" },
+    { text: "A spontaneous trip", trait: "P" },
+    { text: "A mix of both", trait: "P" },
+    { text: "Going wherever the moment takes you", trait: "P" }
+  ]},
+  { question: "You prefer to communicate by...", options: [
+    { text: "Using concise and clear facts", trait: "T" },
+    { text: "Expressing your emotions and values", trait: "F" },
+    { text: "Using examples and reasoning", trait: "T" },
+    { text: "Using empathy and understanding", trait: "F" }
+  ]},
+  { question: "How do you prefer to spend your free time?", options: [
+    { text: "Exploring new ideas", trait: "N" },
+    { text: "Engaging in practical activities", trait: "S" },
+    { text: "Looking for new experiences", trait: "N" },
+    { text: "Reflecting on past experiences", trait: "S" }
+  ]},
+  { question: "When working on a task, you prefer...", options: [
+    { text: "A structured approach", trait: "J" },
+    { text: "A flexible approach", trait: "P" },
+    { text: "Following your intuition", trait: "N" },
+    { text: "Being guided by others' input", trait: "F" }
+  ]},
+  { question: "In a conversation, you tend to...", options: [
+    { text: "Stick to the topic at hand", trait: "S" },
+    { text: "Explore related ideas", trait: "N" },
+    { text: "Offer personal experiences", trait: "F" },
+    { text: "Analyze the facts", trait: "T" }
+  ]},
+  { question: "You’re more likely to remember...", options: [
+    { text: "Specific details", trait: "S" },
+    { text: "The general idea", trait: "N" },
+    { text: "Your feelings about an experience", trait: "F" },
+    { text: "Who was there", trait: "S" }
+  ]},
+  { question: "Your approach to solving problems is...", options: [
+    { text: "Practical and hands-on", trait: "S" },
+    { text: "Theoretical and abstract", trait: "N" },
+    { text: "Strategic and calculated", trait: "T" },
+    { text: "Empathetic and considerate", trait: "F" }
+  ]}
+]; // Use your list of 20 questions exactly here.
+
+const descriptions = {
+  ISTJ: "ISTJ: Responsible, serious, and traditional. Loyal and detail-oriented.",
+  ISFJ: "ISFJ: Nurturing, responsible, and reserved. Devoted to helping others.",
+  INFJ: "INFJ: Idealistic, insightful, and compassionate. Deep thinkers and planners.",
+  INTJ: "INTJ: Independent, strategic, and logical. Visionary and analytical.",
+  ISTP: "ISTP: Action-oriented and pragmatic. Analytical and independent.",
+  ISFP: "ISFP: Gentle, sensitive, and quiet. Artistic and adaptable.",
+  INFP: "INFP: Idealistic and loyal. Driven by their values.",
+  INTP: "INTP: Theoretical, curious, and analytical. Loves abstract ideas.",
+  ESTP: "ESTP: Energetic and perceptive. Lives in the moment.",
+  ESFP: "ESFP: Fun-loving and spontaneous. Values excitement and connection.",
+  ENFP: "ENFP: Enthusiastic and imaginative. Values inspiration and relationships.",
+  ENTP: "ENTP: Inventive and energetic. Enjoys intellectual debates.",
+  ESTJ: "ESTJ: Organized, assertive, and realistic. Strong leadership skills.",
+  ESFJ: "ESFJ: Caring and sociable. Enjoys helping and supporting others.",
+  ENFJ: "ENFJ: Charismatic and altruistic. Inspires and supports others.",
+  ENTJ: "ENTJ: Confident and strategic. Strong leadership and execution skills."
+};
+
+let selectedQuestions = [];
+let currentQuestion = 0;
+
+function shuffleAndPick() {
+  selectedQuestions = [...allQuestions].sort(() => Math.random() - 0.5).slice(0, 10);
+}
+
+function showQuestion() {
+  if (currentQuestion >= selectedQuestions.length) return showResults();
+  const q = selectedQuestions[currentQuestion];
+  document.getElementById("questionContainer").innerHTML = `<div class="question">${q.question}</div>`;
+  const oContainer = document.getElementById("answerOptions");
+  oContainer.innerHTML = "";
+
+  q.options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "answer-button";
+    btn.textContent = opt.text;
+    btn.onclick = () => {
+      typeCounts[opt.trait]++;
+      currentQuestion++;
+      showQuestion();
+    };
+    oContainer.appendChild(btn);
+  });
+}
+
+function calculateMBTI() {
+  return [
+    typeCounts.E >= typeCounts.I ? 'E' : 'I',
+    typeCounts.S >= typeCounts.N ? 'S' : 'N',
+    typeCounts.T >= typeCounts.F ? 'T' : 'F',
+    typeCounts.J >= typeCounts.P ? 'J' : 'P'
+  ].join('');
+}
+
+function getMBTIDescription(type) {
+  return descriptions[type] || "Description not available.";
+}
+
+function showResults() {
+  const type = calculateMBTI();
+  document.getElementById("mbtiType").innerHTML = `Your MBTI Type: <strong>${type}</strong>`;
+  document.getElementById("mbtiDesc").innerHTML = getMBTIDescription(type);
+  document.getElementById("resultBox").style.display = "block";
+}
+
+function retakeQuiz() {
+  currentQuestion = 0;
+  for (let t in typeCounts) typeCounts[t] = 0;
+  document.getElementById("resultBox").style.display = "none";
+  shuffleAndPick();
+  showQuestion();
+}
+
+function goToResultPage() {
+    const type = calculateMBTI();
+    localStorage.setItem("mbtiType", type);
+    localStorage.setItem("mbtiDesc", getMBTIDescription(type));
+    localStorage.setItem("mbtiCounts", JSON.stringify(typeCounts));
+    window.location.href = "result.html";
+  }
+
+  shuffleAndPick();
+  showQuestion();
+</script>
+</script>
+</body>
+</html>
